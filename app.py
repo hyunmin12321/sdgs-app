@@ -2,37 +2,85 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# 1. 페이지 설정 (대회용 전문적인 타이틀)
+# 1. 페이지 설정
 st.set_page_config(page_title="AI 기반 SDGs 아이디어 평가 시스템", page_icon="🧠", layout="centered")
 
-# --- 🎨 4번 구현: SDGs 글로벌 지구본 배경 디자인 (CSS 마법) ---
-# 전 세계 SDGs를 상징하는 원형 그래픽 배경을 사이트 전체에 깔아줍니다.
-background_css = """
+# --- 🚀 디자인 초고도화: SF 테크 및 SDGs 감성 스타일 (CSS) ---
+advanced_css = """
 <style>
+/* 1. 사이트 전체 배경: 우주와 지구 느낌의 고급스러운 어두운 배경 */
 [data-testid="stAppViewContainer"] {
-    background-image: url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920"); /* 부드러운 글로벌 추상 배경 */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.75)), 
+                      url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
+
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
-/* 글자가 잘 보이도록 중앙 컨테이너에 살짝 투명한 유리창 효과 주기 */
+
+/* 2. 중앙 메인 컨테이너: 은은하게 빛나는 유리창(Glassmorphism) 효과 */
 .block-container {
-    background: rgba(255, 255, 255, 0.92);
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 3.5rem;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    margin-top: 3rem;
+    color: #FFFFFF !important;
+}
+
+/* 3. 입력창 및 선택 상자 디자인 테두리 밝게 강조 */
+div[data-baseweb="select"], div[data-baseweb="input"] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+input {
+    color: #FFFFFF !important;
+}
+label, p {
+    color: #E5E7EB !important;
+    font-weight: 500 !important;
+}
+
+/* 4. 버튼 디자인: 마우스를 올리면 네온 빛이 나는 하이테크 버튼 */
+.stButton>button {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+    color: white !important;
+    border-radius: 14px !important;
+    border: none !important;
+    padding: 0.75rem 2rem !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important;
+    transition: all 0.3s ease !important;
+}
+.stButton>button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6) !important;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+}
+
+/* 5. 결과창 박스 테두리에 네온 조명 효과 */
+div[data-testid="stColorBlock"] {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
 }
 </style>
 """
-st.markdown(background_css, unsafe_allow_html=True)
+st.markdown(advanced_css, unsafe_allow_html=True)
 
-# 2. 상단 타이틀 및 로고 연출
-st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🧠 AI 기반 글로벌 SDGs 아이디어 스코어링 시스템</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #4B5563;'>구글 Gemini 2.5 AI가 17대 지속가능발전목표(SDGs)를 기반으로 아이디어를 고도화합니다.</p>", unsafe_allow_html=True)
+# 2. 타이틀 네온 스타일링
+st.markdown("<h1 style='text-align: center; color: #60A5FA; font-weight: 800; font-size: 2.2rem; text-shadow: 0 0 15px rgba(96,165,250,0.5);'>🧠 GLOBAL SDGs AI EVALUATION SYSTEM</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #9CA3AF; font-size: 1.05rem; margin-bottom: 2rem;'>지속가능발전목표(SDGs) 달성을 위한 AI 기반 아이디어 스코어링 및 고도화 플랫폼</p>", unsafe_allow_html=True)
 
 st.divider()
 
@@ -60,8 +108,10 @@ issue_category = st.selectbox(
 )
 
 if issue_category != "선택하세요":
+    st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("💡 아이디어 제안")
     user_idea = st.text_input("우리가 실천할 수 있는 구체적인 방법을 적어주세요:", placeholder="예: 학교 급식 잔반을 이용한 퇴비화 및 지역 농가 기부")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     if st.button("AI 심층 분석 시작하기", use_container_width=True):
         if user_idea.strip() == "":
@@ -69,7 +119,7 @@ if issue_category != "선택하세요":
         else:
             with st.spinner("🔄 AI 멘토가 문맥 분석 및 아이디어 고도화 방안을 생성 중입니다..."):
                 try:
-                    # AI에게 줄 특수 명령어 (프롬프트 튜닝)
+                    # AI 프롬프트
                     prompt = f"""
                     너는 SDGs(지속가능발전목표) 사회문제 해결 경진대회의 전문 심사위원 AI이자 전문 컨설턴트이다.
                     사용자가 '{issue_category}' 분야에 대해 다음과 같은 아이디어를 제안했다:
@@ -86,7 +136,6 @@ if issue_category != "선택하세요":
                     개선안: (아이디어를 더 발전시키기 위한 구체적인 AI 개선 제안 3가지를 한 문장씩 적을 것. 예: 1. ~ / 2. ~ / 3. ~)
                     """
                     
-                    # Gemini AI에게 요청 보내기
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=prompt,
@@ -118,9 +167,9 @@ if issue_category != "선택하세요":
                     except:
                         score_num = 50
                     
-                    # --- 🎨 2번 디자인 구현: 결과창 상자 및 게이지 바 ---
+                    # --- 🎨 결과창 디자인 ---
                     with st.container(border=True):
-                        st.subheader("📊 AI 심사 심층 결과")
+                        st.markdown("<h3 style='color: #60A5FA;'>📊 AI 심사 심층 결과</h3>", unsafe_allow_html=True)
                         
                         col1, col2 = st.columns(2)
                         with col1:
@@ -139,18 +188,17 @@ if issue_category != "선택하세요":
                             delta_color = "normal" if "우수" in status or "보통" in status else "inverse"
                             st.metric(label="아이디어 실현 가능성 점수", value=f"{score_num} / 100", delta=delta_msg, delta_color=delta_color)
                         
-                        # 📊 점수 게이지 바 효과
                         st.write("**스코어 진행도:**")
                         st.progress(score_num / 100)
                         
-                        st.markdown(f"**📝 종합 심사평:**\n{reason_val}")
+                        st.markdown(f"<div style='background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 10px; margin-top: 1rem;'><strong>📝 종합 심사평:</strong><br>{reason_val}</div>", unsafe_allow_html=True)
                     
                     # 🚀 AI의 아이디어 고도화 추천 제안 출력
                     if suggestions and ("부적절" not in status):
                         st.write("")
                         with st.expander("🚀 아이디어를 업그레이드하기 위한 AI의 비밀 제안 (열기)", expanded=True):
                             for sug in suggestions:
-                                st.write(sug)
+                                st.markdown(f"<p style='color: #F3F4F6;'>{sug}</p>", unsafe_allow_html=True)
                                 
                 except Exception as e:
                     st.error(f"AI 연결 중 에러가 발생했습니다: {e}")
