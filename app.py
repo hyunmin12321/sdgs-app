@@ -5,31 +5,57 @@ from google.genai import types
 # 1. 페이지 설정 (대회용 전문적인 타이틀)
 st.set_page_config(page_title="AI 기반 SDGs 아이디어 평가 시스템", page_icon="🧠", layout="centered")
 
-st.title("🧠 AI 기반 글로벌 SDGs 아이디어 스코어링 및 고도화 시스템")
-st.write("구글 Gemini AI가 여러분의 아이디어를 심층 분석하고 발전적인 개선안을 제시합니다.")
+# --- 🎨 4번 구현: SDGs 글로벌 지구본 배경 디자인 (CSS 마법) ---
+# 전 세계 SDGs를 상징하는 원형 그래픽 배경을 사이트 전체에 깔아줍니다.
+background_css = """
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image: url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920"); /* 부드러운 글로벌 추상 배경 */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
+/* 글자가 잘 보이도록 중앙 컨테이너에 살짝 투명한 유리창 효과 주기 */
+.block-container {
+    background: rgba(255, 255, 255, 0.92);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+</style>
+"""
+st.markdown(background_css, unsafe_allow_html=True)
+
+# 2. 상단 타이틀 및 로고 연출
+st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🧠 AI 기반 글로벌 SDGs 아이디어 스코어링 시스템</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #4B5563;'>구글 Gemini 2.5 AI가 17대 지속가능발전목표(SDGs)를 기반으로 아이디어를 고도화합니다.</p>", unsafe_allow_html=True)
 
 st.divider()
 
-# --- 🔒 4번 보안 구현: Streamlit 비밀 금고(Secrets)에서 키 가져오기 ---
+# --- 🔒 보안 구현: Streamlit 비밀 금고(Secrets)에서 키 가져오기 ---
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=API_KEY)
 except Exception:
-    st.error("⚠️ Streamlit Secrets 설정에 'GEMINI_API_KEY'가 누락되었거나 올바르지 않습니다! 대시보드 설정을 확인해 주세요.")
+    st.error("⚠️ Streamlit Secrets 설정에 'GEMINI_API_KEY'가 누락되었습니다! 대시보드 설정을 확인해 주세요.")
     st.stop()
 
-# 2. 문제 분야 선택
+# 3. 문제 분야 선택 (17개 SDGs 핵심 목표 반영)
 issue_category = st.selectbox(
     "어떤 사회 문제에 관심이 있나요?",
     [
         "선택하세요", 
-        "빈곤 퇴치 및 건강 🏥",
-        "양질의 교육 제공 📚",
-        "기후변화와 환경 오염 🌍", 
-        "불평등 해소 🤝", 
-        "깨끗한 에너지 ⚡", 
-        "기아 종식 및 식량 안보 🌾", 
-        "산업, 혁신 및 인프라 🏭"
+        "무빈곤 및 보건·복지 (Goal 1, 3) 🏥",
+        "모두를 위한 양질의 교육 (Goal 4) 📚",
+        "기후변화 대응 및 해양·육상 생태계 보전 (Goal 13, 14, 15) 🌍", 
+        "불평등 완화 및 인권 존중 (Goal 10) 🤝", 
+        "신재생 에너지 및 깨끗한 물 (Goal 6, 7) ⚡", 
+        "기아 종식 및 지속가능한 농업 (Goal 2) 🌾", 
+        "산업 혁신, 인프라 및 지속가능한 도시 (Goal 9, 11) 🏭"
     ]
 )
 
@@ -87,7 +113,6 @@ if issue_category != "선택하세요":
                             if "개선안:" not in line:
                                 suggestions.append(line.strip())
                     
-                    # '85점'에서 숫자 85만 쏙 빼와서 숫자로 변환
                     try:
                         score_num = int(score_val.replace("점", "").strip())
                     except:
@@ -97,12 +122,11 @@ if issue_category != "선택하세요":
                     with st.container(border=True):
                         st.subheader("📊 AI 심사 심층 결과")
                         
-                        # 화면을 반으로 쪼개서 깔끔하게 배치
                         col1, col2 = st.columns(2)
                         with col1:
                             if "우수" in status:
                                 st.success(f"✨ **최종 판정: {status}**")
-                                st.balloons() # 우수하면 풍선 날리기! 🎈
+                                st.balloons() 
                             elif "보통" in status:
                                 st.info(f"ℹ️ **최종 판정: {status}**")
                             elif "개선 필요" in status:
@@ -111,18 +135,17 @@ if issue_category != "선택하세요":
                                 st.error(f"🚨 **최종 판정: {status}**")
                         
                         with col2:
-                            # 4단계 판정에 따른 안내 문구 색상 세팅
-                            delta_msg = "합격 (우수)" if "우수" in status or "보통" in status else "주의 (보단/부적절)"
+                            delta_msg = "합격 (우수)" if "우수" in status or "보통" in status else "주의 (보완 필요)"
                             delta_color = "normal" if "우수" in status or "보통" in status else "inverse"
                             st.metric(label="아이디어 실현 가능성 점수", value=f"{score_num} / 100", delta=delta_msg, delta_color=delta_color)
                         
-                        # 📊 점수 게이지 바 (시각적 효과 극대화!)
+                        # 📊 점수 게이지 바 효과
                         st.write("**스코어 진행도:**")
                         st.progress(score_num / 100)
                         
                         st.markdown(f"**📝 종합 심사평:**\n{reason_val}")
                     
-                    # 🚀 챗GPT 추천: AI의 아이디어 고도화 추천 제안 출력
+                    # 🚀 AI의 아이디어 고도화 추천 제안 출력
                     if suggestions and ("부적절" not in status):
                         st.write("")
                         with st.expander("🚀 아이디어를 업그레이드하기 위한 AI의 비밀 제안 (열기)", expanded=True):
